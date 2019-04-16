@@ -1,61 +1,123 @@
 .. _lab_manage_workloads:
 
 ------------------------
-Lab - Managing Workloads
+Managing Workloads Lab
 ------------------------
 
 Overview
 ++++++++
 
-Get experience using VM management tasks from Prism, which include power actions, searching, cloning, and migrating.
+Now that you have a couple VMs deployed, let’s have some fun and explore some of the VM management tasks with AHV (power actions, searching, cloning, and migrating).
 
 Workload Management
 +++++++++++++++++++
-
-Now that you have a couple VMs deployed, let’s have some fun and explore some of the VM management tasks with AHV.
 
 Power Actions and Console Access
 ................................
 
 Explore VM power actions and console access.
 
-In **Prism Central > Explore > VMs**.
+#. In **Prism Element > VM > Table**, use the search bar to locate the Linux VM you created in the previous exercise (*Initials*-**Linux_VM**).
 
-Locate the Linux VM you created in the previous lab (Linux_VM-*initials*). (Use Prism’s search function if necessary)
+   Note that the Power State column for that VM shows a red dot, indicating that the VM is powered off.
+
+#. Select the VM, then click **Power On**.
+
+#. Select the VM, then click **Launch Console**.
+
+   The console window provides 4 actions: Mount ISO, CTRL-ALT-DEL, Take Screen Capture, and Power.
+
+   .. figure:: images/manage_workloads_01.png
+
+   .. note::
+
+     In ESX:
+
+     - The steps in this exercise could also be done from Prism while using an ESXi cluster that has its VMware vCenter instance registered to Prism.
+
+     .. figure:: images/manage_workloads_06.png
+
+Cloning VMs
+...........
+
+#. In **Prism Element > VM > Table**, select your *Initials*-**Linux_VM** VM.
+
+#. Click **Clone** from the **Actions** list.
+
+#. Fill out the following fields and click **Save**:
+
+   - **Number of Clones** - 2
+   - **Prefix Name**  - *Initials*-Linux-Clone
+   - **Starting Index Number** - 1
+
+   .. figure:: images/manage_workloads_02.png
+
+#. Leave them **Powered Off**.
+
+   Both Nutanix snapshots and clones use a `redirect-on-write <https://nutanixbible.com/#anchor-book-of-acropolis-snapshots-and-clones>`_ algorithm to quickly and efficiently create copies of VMs as a metadata operation.
+
+Migrating a VM Between Hosts
+............................
+
+VM live migration is a critical feature for any virtualized environment, allowing VMs to move seamlessly across hosts within a cluster to enable infrastructure maintenance or performance balancing.
+
+#. In **Prism Element > VM > Table**, select your *Initials*-**Linux_VM** VM.
+
+   You should see that it has no entry in the **Host** column when it is powered off.
+
+   .. figure:: images/manage_workloads_03.png
+
+#. Select the **Powered On** VM, then click **Migrate**.
+
+   You can either choose one of the other hosts in the cluster as a migration target for the VM, or accept the default and let AHV automatically select a location.
+
+#. Click **Migrate** to finalize the action.
+
+   When the task completes, verify that your VM host location has changed from the host recorded above to the new location you selected.
+
+   .. figure:: images/manage_workloads_04.png
+
+Configuring Affinity Policies
+.............................
+
+#. In **Prism Element > VM > Table**, select your *Initials*-**Linux_VM** VM.
+
+#. Select a **Powered Off** VM, then click **Update** and **+ Set Affinity**.
+
+#. Select two **Hosts** to which the VM can have affinity, and click **Save** and **Save** to finish.
+
+   .. note:: We select more then one host so the VM has a place to migrate too in the event of a Node failure.
+
+#. Power on the VM, and verify it is on one of the **Hosts** you selected in the affinity policy.
+
+#. Select the VM, then click **Migrate**.
+
+   You should see the following message:
+
+   - This VM has host affinity with 2 out of the 4 available hosts. It can only be migrated to those hosts.
+
+#. Click **Migrate**.
+
+   You should see that the VM has moved to the other host.
+
+VM-to-Host affinity rules are commonly used to map VMs to certain hosts for performance or licensing reasons. AHV can also create VM-to-VM anti-affinity rules, commonly used for highly available applications where you need to ensure multiple instances of an application do not run on the same node.
+
+High Availability & Dynamic Scheduling
+......................................
+
+Unlike ESXi, high availability is enabled by default for AHV and will restart VMs in a best-effort manner in the event of a host failure. Additional configuration can set resource reservations to ensure there is capacity during an HA event.
 
 .. note::
 
-  Note that the Power State column for that VM shows a red dot, indicating that the VM is powered off.
+   To enable memory reservation, select **Enable HA Reservation** under :fa:`cog` **> Manage VM High Availability**.
 
-Now lets power on the VM:
+   As memory is already limited on the shared cluster resources, please do NOT enable HA memory reservations.
 
-Select the VM, then click **Power On** from the **Actions** drop-down menu.
+With the **Acropolis Dynamic Scheduler** service, AHV performs intelligent initial placement of VMs and can dynamically migrate VMs to other hosts within the cluster to optimize workload performance. This is done "out of the box" without additional configuration.
 
-.. note::
+A benefit of a Nutanix AHV solution is being able to make VM placement decisions not based solely on CPU/memory congestion avoidance, but also based on storage performance.
 
-  See the list of available actions (Update, Delete, Clone, Launch Console, Power On, Pause/Suspend, Snapshot, Migrate, and so on).
-  Note that Launch Console is shaded. This action is not available because the VM is off.
-
-Next lets open a console session:
-
-Select the VM, then click **Launch Console** from the **Actions** drop-down menu.
-
-.. note::
-
-  When the console window opens, note that there are three actions available in the console (Send CTRL-ALT-DEL, Take Screen Capture, and Power).
-
-  Power On in the Actions menu changes to Power Off once the VM has been powered on. You can also click on the name of the VM to open a console window for a specific VM. This console window contains all of the options available under the Actions menu, performance-related information, and other relevant VM details.
-
-.. figure:: images/manage_workloads_01.png
-
-.. note::
-
-  In ESX:
-
-  - The steps in this exercise could also be done from Prism while using an ESXi cluster that has its VMware vCenter instance is registered to Prism.
-  - The image below shows the side by side comparison of what the Actions drop down menu would look like for a VM hosted in ESXi versus one hosted in AHV.
-
-  .. figure:: images/manage_workloads_06.png
+See `here <https://nutanixbible.com/#anchor-book-of-acropolis-dynamic-scheduler>`_ for additional details about the **Acropolis Dynamic Scheduler**.
 
 Prism Search
 ............
@@ -72,7 +134,7 @@ Suggestions:
 - powered on
 - powered on cpu = 8
 
-In **Prism Central >** :fa:`search`.
+#. In **Prism Central >** :fa:`search`.
 
 - Note the result types: Entity, Alerts, and Help.
 - Click the star icon to save a search.
@@ -80,92 +142,6 @@ In **Prism Central >** :fa:`search`.
 .. note::
 
   The search hot key (a slash mark, or /) can be used from anywhere in the Prism Central UI to bring up the search function.
-
-Clone a VM
-..........
-
-In **Prism Central > Explore > VMs**.
-
-Find and clone four copies of the CentOS-base virtual machine.
-
-Select the VM, then click **Clone** from the **Actions** drop-down menu.
-
-Fill out the following fields and click **Save**:
-
-- **Number of Clones** - 4
-- **Prefix Name**  - Flow-*initials*-Clone
-- **Starting Index Number** - 1
-
-.. figure:: images/manage_workloads_02.png
-
-Leave them powered off as they are used in the optional Flow Lab.
-
-Migrate a VM Between Hosts
-..........................
-
-In **Prism Central > Explore > VMs**.
-
-Locate the Linux Vm from the previous lab (Linux_VM-*initials*).
-
-- If the VM is powered on, power it Off
-
-You should see that it has no entry in the **Host** column when it is powered off.
-
-Power on the VM, and make note of the **Hosts Name** in the **Host** column.
-
-.. figure:: images/manage_workloads_03.png
-
-Select the VM, then click **Migrate** from the **Actions** drop-down menu.
-
-You can either choose one of the other hosts in the cluster as a migration target for the VM, or accept the default and let AHV automatically select a location.
-
-Click **Migrate** to finalize the action.
-
-When the task completes, verify that your VM host location has changed from the host recorded above to the new location you selected.
-
-.. figure:: images/manage_workloads_04.png
-
-Configure VM-to-Host Affinity Policies
-......................................
-
-In **Prism Central > Explore > VMs**.
-
-Locate the Linux Vm from the previous lab (Linux_VM-*initials*).
-
-- If the VM is powered on, power it Off
-
-Select the VM, then click **Configure VM Host Affinity** from the **Actions** drop-down menu.
-
-Select one **Host** to which the VM can have affinity, and click Save to finish.
-
-Power On the VM, and verify it is on the **Host** you selected in the affinity policy.
-
-Select the VM, then click **Migrate** from the **Actions** drop-down menu.
-
-- This VM has host affinity set to host NTNXAHV-2. It cannot be migrated to any other host without setting the host affinity to that host.
-
-Click **Cancel** to exit migration.
-
-Select the VM, then click **Configure VM Host Affinity** from the **Actions** drop-down menu.
-
-Select another **Host** to which the VM can have affinity, and click Save to finish.
-
-Select the VM, then click **Migrate** from the **Actions** drop-down menu.
-
-- There is now a drop-down menu displaying the available hosts.
-
-Either select a host manually or allow AHV to select it, then click **Migrate**.
-
-You should see that the VM has moved to the other host.
-
-.. figure:: images/manage_workloads_05.png
-
-High Availability
-.................
-
-High availability is enabled by default for AHV and will restart VMs in a best-effort manner in the event of a host failure. Additional configuration can set resource reservations to ensure there is capacity during an HA event.
-
-VMware HA works by providing high availability for virtual machines by pooling the virtual machines and the hosts they reside on into a cluster. The hosts in that cluster are then monitored and in case there is a failure, the VMs residing on the failed host would get restarted on alternate hosts. This feature must be turned on in vSphere, as opposed to AHV where it’s on by default without reservation.
 
 Takeaways
 +++++++++

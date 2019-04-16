@@ -1,4 +1,4 @@
-.. title:: Introduction to Nutanix AHV
+.. title:: Nutanix Technology Bootcamp
 
 .. toctree::
   :maxdepth: 2
@@ -11,8 +11,8 @@
 
 .. toctree::
   :maxdepth: 2
-  :caption: Nutanix Configuration Labs
-  :name: _nutanix_configuration_labs
+  :caption: Nutanix Configuration
+  :name: _nutanix_configuration
   :hidden:
 
   lab_nutanix_tech_overview/lab_nutanix_tech_overview
@@ -32,12 +32,11 @@
 
 .. toctree::
   :maxdepth: 2
-  :caption: Monitoring and Managing the Environment
-  :name: _monitoring_and_managing_the_environment
+  :caption: Security Compliance
+  :name: _security_compliance
   :hidden:
 
-  monitoring_and_managing_env/monitoring_and_managing_env
-  lab_monitoring_env/lab_monitoring_env
+  lab_stig/lab_stig
 
 .. toctree::
   :maxdepth: 2
@@ -45,47 +44,7 @@
   :name: _optional_labs
   :hidden:
 
-  authentication/authentication
-  files_deploy/files_deploy
-  calm_enable/calm_enable
-
-.. toctree::
-  :maxdepth: 2
-  :caption: Optional Files Labs
-  :name: _optional_files_labs
-  :hidden:
-  
-  files_smb_share/files_smb_share
-  files_nfs_export/files_nfs_export
-
-.. toctree::
-  :maxdepth: 2
-  :caption: Optional Flow Lab
-  :name: _optional_flow_lab
-  :hidden:
-
-  what_is_flow/what_is_flow
-  flow_enable/flow_enable
-  flow_quarantine_vm/flow_quarantine_vm
-  flow_isolate_environments/flow_isolate_environments
-  flow_secure_app/flow_secure_app
-  flow_visualization/flow_visualization
-
-.. toctree::
-  :maxdepth: 2
-  :caption: Optional Calm Lab
-  :name: _optional_calm_lab
-  :hidden:
-
-  what_is_calm/what_is_calm
-  calm_projects/calm_projects
-  calm_sshkey_creation/calm_sshkey_creation
-  calm_mysql_blueprint/calm_mysql_blueprint
-  calm_3twa_blueprint/calm_3twa_blueprint
-  calm_windows_blueprint/calm_windows_blueprint
-  calm_marketplace/calm_marketplace
-
-
+  .. lab_image_configuration/lab_image_configuration
 
 .. toctree::
   :maxdepth: 2
@@ -93,6 +52,8 @@
   :name: _appendix
   :hidden:
 
+  tools_vms/windows_tools_vm
+  tools_vms/linux_tools_vm
   appendix/glossary
   appendix/basics
 
@@ -102,27 +63,28 @@
 Getting Started
 ---------------
 
-Welcome to the Nutanix Technology Bootcamp! This workbook accompanies an instructor-led session that introduces Nutanix technologies and many common management tasks. Each section has a lesson and an exercise to give you hands-on practice. The instructor explains the exercises and answers any additional questions that you may have.
+Welcome to the Nutanix Technology Bootcamp! This workbook accompanies an instructor-led session that introduces Nutanix Core technologies and many common management tasks.
 
-At the end of the bootcamp, attendees should understand the basic concepts and technologies that make up the Nutanix Enterprise Cloud stack and should be well prepared for a hosted or onsite proof-of-concept (POC) engagement.
+You will explore Prism Element and become familiar with its features and navigation. You will use Prism to perform basic cluster administration tasks, including storage and networking. You will also walk through basic VM deployment and management tasks with Prism and AHV. Finally, you will explore VM data protection, including snapshots and replication. The instructor explains the exercises and answers any additional questions that you may have.
+
+At the end of the bootcamp, attendees should understand the Core concepts and technologies that make up the Nutanix Enterprise Cloud stack and should be well prepared for a hosted or onsite proof-of-concept (POC) engagement.
 
 What's New
 ++++++++++
-
 - Workshop updated for the following software versions:
-    - AOS & PC 5.8.1
+    - AOS & PC 5.10.x
 
 - Optional Lab Updates:
-    - Calm
-    - Flow
+    - Files
 
 Agenda
 ++++++
 
 - Introductions
 - Nutanix Technology Overview
-- Nutanix Configuration Labs
+- Nutanix Configuration
 - Deploying and Managing Workloads
+- Security Compliance
 - Monitoring and Managing the Environment
 
 Introductions
@@ -152,6 +114,7 @@ Hosted POC clusters follow a standard naming convention:
 - **Cluster IP** - 10.**21**.\ *XYZ*\ .37
 
 If provisioned from the marketing pool:
+
 - **Cluster Name** - MKT\ *XYZ*
 - **Subnet** - 10.**20**.\ *XYZ*\ .0
 - **Cluster IP** - 10.**20**.\ *XYZ*\ .37
@@ -167,7 +130,6 @@ Throughout the Workshop there are multiple instances where you will need to subs
 .. list-table::
    :widths: 25 75
    :header-rows: 1
-
    * - IP Address
      - Description
    * - 10.21.\ *XYZ*\ .37
@@ -182,7 +144,6 @@ Each cluster is configured with 2 VLANs which can be used for VMs:
 .. list-table::
   :widths: 25 25 10 40
   :header-rows: 1
-
   * - Network Name
     - Address
     - VLAN
@@ -206,7 +167,6 @@ Credentials
 .. list-table::
    :widths: 25 35 40
    :header-rows: 1
-
    * - Credential
      - Username
      - Password
@@ -228,7 +188,6 @@ Each cluster has a dedicated domain controller VM, **DC**, responsible for provi
 .. list-table::
    :widths: 25 35 40
    :header-rows: 1
-
    * - Group
      - Username(s)
      - Password
@@ -253,22 +212,40 @@ Access Instructions
 
 The Nutanix Hosted POC environment can be accessed a number of different ways:
 
+
+Parallels VDI
+.................
+
+Login to: https://xld-uswest1.nutanix.com (for PHX) or https://xld-useast1.nutanix.com (for RTP)
+
+**Nutanix Employees** - Use your NUTANIXDC credentials
+**Non-Employees** - **Username:** POCxxx-User01 (up to POCxxx-User20), **Password:** *<Provided by Instructor>*
+
 Employee Pulse Secure VPN
 ..........................
 
-https://sslvpn.nutanix.com - Use your CORP credentials
+To download the client: login to https://xlv-uswest1.nutanix.com or https://xlv-useast1.nutanix.com - **Username:** POCxxx-User01 (up to POCxxx-User20), **Password:** *<Provided by Instructor>*
 
-Non-Employee Pulse Secure VPN
-..............................
+Download and install the client.
 
-https://lab-vpn.nutanix.com - **Username:** POCxxx-User01 (up to POCxxx-User20), **Password:** *<Provided by Instructor>*
+In Pulse Secure Client, **Add** a connection:
 
-Under **Client Application Sessions**, click **Start** to the right of **Pulse Secure** to download the client.
-
-Install and open **Pulse Secure**.
-
-Add a connection:
+For PHX:
 
 - **Type** - Policy Secure (UAC) or Connection Server
-- **Name** - HPOC VPN
-- **Server URL** - lab-vpn.nutanix.com
+- **Name** - X-Labs - PHX
+- **Server URL** - xlv-uswest1.nutanix.com
+
+For RTP:
+
+- **Type** - Policy Secure (UAC) or Connection Server
+- **Name** - X-Labs - RTP
+- **Server URL** - xlv-useast1.nutanix.com
+
+
+Nutanix Version Info
+++++++++++++++++++++
+
+- **AHV Version** - AHV 20170830.185 (5.9+/5.10+)
+- **AOS Version** - 5.10.2
+- **PC Version** - 5.10.2
